@@ -22,6 +22,9 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 # configfilein and configfileout must be passed in as full path that is  /home/user/file.json is correct and
 # ~/file.json is wrong
 def cli(config, configfilein, configfileout):
+    if not os.path.isfile(configfilein):
+        with open(configfilein,"w") as file:
+            file.write("{}")
     config.configfile_in = configfilein
     config.configfile_out = configfileout
 
@@ -35,7 +38,7 @@ def gc(config, name):
     This configures your current git project to use the git client
      you passed in with the name argument
     """
-    gitclient = name.lower().replace(" ","")
+    gitclient = name.lower().replace(" ", "")
     git_credentials = json.load(open(config.configfile_in))#get_cre()
     try:
         os.system('git config user.name ' + git_credentials[gitclient]["user.name"])
