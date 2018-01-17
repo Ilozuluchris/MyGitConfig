@@ -16,4 +16,4 @@ As a fellow programmer I am sure you would appreciate the one line decrease, see
     - This adds a new git client using the arguments supplied
     
  **NOTE:All commands take in two optional arguments `--configfilein` and `--configfileout`.
-These arguments are paths to json files used for reading and saving git credentials.They both default to the file `~/.gitclients_credentials.json`. If any the files passed in does not exist they are created**
+These arguments are paths to json files used for reading and saving git credentials respectively.They both default to the file `~/.gitclients_credentials.json`. If any the files passed in does not exist they are created**
