@@ -15,7 +15,7 @@ def get_reply_to_create_file(file):
     elif reply == "N":
         return False
     else:
-        click.echo("Did not understand reply {}".format(reply))
+        click.echo("Did not understand reply {}, please try again.".format(reply))
         get_reply_to_create_file(file)
 
 class Config(object):
@@ -41,17 +41,13 @@ def cli(config, configfilein, configfileout):
     config.configfile_out = configfileout
 
 
-@cli.command("gitclient")
+@cli.command("configure",short_help="Configure current git project to use client passed in with arg name")
 @click.option('--name', prompt='Name of git client',
               help='The name of the git client you want to configure your current git project for')
 @pass_config
 def gc(config, name):
-    """
-    This configures your current git project to use the git client
-     you passed in with the name argument
-    """
     gitclient = name.lower().replace(" ", "")
-    git_credentials = json.load(open(config.configfile_in))#get_cre()
+    git_credentials = json.load(open(config.configfile_in))
     try:
         os.system('git config user.name ' + git_credentials[gitclient]["user.name"])
         os.system('git config user.email ' + git_credentials[gitclient]["user.email"] )               
@@ -59,15 +55,13 @@ def gc(config, name):
     except KeyError:
         click.echo ("You have not added details for this client yet, please add it by running passing the add argument")
 
+
 @cli.command('add',short_help="Use this to add new git client")
 @click.option('--gc',prompt="Name of git client you want to add",help='Pass in the name of the new git client to pass like so github.Note everything passed in is converted to lower case and trimmed...ie GIT hub becomes github')
-@click.option("--username",prompt="Username for this client",help="Add in  your username")
-@click.option("--useremail",prompt="Email for this new client", help="Passing the email")
+@click.option("--username",prompt="Username for this client",help="Username to use for client")
+@click.option("--useremail",prompt="Email for this new client", help="Email to use for client")
 @pass_config
 def add(config, gc,username,useremail):
-    """
-    Add credentials for a new git client
-    """
     if not is_valid_email(useremail):
         raise Exception("Email {} is not valid".format(useremail))
     git_client = gc.lower().replace(" ", "")
