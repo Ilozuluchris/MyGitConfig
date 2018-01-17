@@ -9,6 +9,10 @@ import click
 def is_valid_email(string):
     return re.match(r"\w+@\w+.*", string)
 
+def default_config_file():
+    home_dir = os.path.expanduser("~")
+    default_file = home_dir+"/gitclients_credentials.json"
+    return default_file
 
 def get_reply_to_create_file(file_name):
     reply = raw_input("File {} does not exist.Do you want to create it? Answer Y/N: ".format(file_name)).upper()
@@ -27,11 +31,10 @@ class Config(object):
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
-
 @click.group()
-@click.option("--configfilein", type=click.Path(), default="gitclients_credentials.json", required=False,
+@click.option("--configfilein", type=click.Path(), default=default_config_file(), required=False,
               help="Credentials file to read from")
-@click.option("--configfileout", type=click.Path(), default="gitclients_credentials.json", required=False,
+@click.option("--configfileout", type=click.Path(), default=default_config_file(), required=False,
               help="Credentials file to write. This file would be used when adding new git clients")
 @pass_config
 # configfilein and configfileout must be passed in as full path that is  /home/user/file.json is correct and
@@ -43,6 +46,7 @@ def cli(config, configfilein, configfileout):
             raise Exception("Stopped script since file {} was not created".format(configfilein))
         with open(configfilein, mode="w") as configfile:
             configfile.write("{}")
+
     config.configfile_in = configfilein
     config.configfile_out = configfileout
 
