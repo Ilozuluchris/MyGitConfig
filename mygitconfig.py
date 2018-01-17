@@ -5,9 +5,18 @@ import os
 
 import click
 
-def valid_email(string):
+def is_valid_email(string):
     return re.match(r"\w+@\w+.*", string)
 
+def get_reply_to_create_file(file):
+    reply = raw_input("File {} does not exist.Do you want to create it? Answer Y/N: ".format(file)).upper()
+    if reply == "Y":
+        return True
+    elif reply == "N":
+        return False
+    else:
+        click.echo("Did not understand reply {}".format(reply))
+        get_reply_to_create_file(file)
 
 class Config(object):
     pass
@@ -23,6 +32,9 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 # ~/file.json is wrong
 def cli(config, configfilein, configfileout):
     if not os.path.isfile(configfilein):
+        reply = get_reply_to_create_file(configfilein)
+        if not reply:
+            raise  Exception("Stopped script since file {} was not created".format(configfilein))
         with open(configfilein,"w") as file:
             file.write("{}")
     config.configfile_in = configfilein
@@ -56,7 +68,7 @@ def add(config, gc,username,useremail):
     """
     Add credentials for a new git client
     """
-    if not valid_email(useremail):
+    if not is_valid_email(useremail):
         raise Exception("Email {} is not valid".format(useremail))
     git_client = gc.lower().replace(" ", "")
     git_credentials = json.load(open(config.configfile_in))
