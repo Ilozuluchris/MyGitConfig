@@ -1,4 +1,4 @@
-import os 
+import os
 
 from setuptools import setup
 
@@ -20,7 +20,3 @@ setup (
 		mygitconfig=mygitconfig:cli
 		''',
 )
-
-#so script can be called anywhere 
-os.system('chmod a+x mygitconfig.py')
-os.system('export PATH=mygitconfig.py:$PATH')
