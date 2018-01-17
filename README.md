@@ -7,6 +7,8 @@ Introducing mygitconfig. Reduce the number of lines required  to configure a git
 As a fellow programmer I am sure you would appreciate the one line decrease, seeing how much time it takes to make some extra keystrokes.
 
 *This was tested only on Ubuntu 16.04 LTS*
+## Installation:
+  Clone repo and type `python setup.py install` in the terminal.
 ## Commands:
 - configure
   - Code:&ensp;`mygitconfig configure --name clientname`
