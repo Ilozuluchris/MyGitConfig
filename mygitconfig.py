@@ -6,21 +6,25 @@ import click
 
 class Config(object):
     def __init__(self):
-        self.config_file = open('gitclients_credentials.json')
+        pass
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
 @click.group()
-@click.argument("configfile",type=click.File("w+"),default="gitclients_credentials.json",required=False)
+@click.option("--configfilein",type=click.File("r"),default="gitclients_credentials.json",required=False)
+@click.option("--configfileout",type=click.File("w"),default="gitclients_credentials.json",required=False)
 @pass_config
-def cli(config, credentials_file):
-    if credentials_file is None:
+def cli(config, configfilein, configfileout):
+    if configfilein is None:
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         print os.getcwd()
-        config.config_file = credentials_file
+        config.configfile_in = configfilein
+        config.configfile_out = configfileout
     else:
-        config.config_file=credentials_file
+        print os.getcwd()
+        config.configfile_in = configfilein
+        config.configfile_out = configfileout
 
 
 
@@ -31,6 +35,12 @@ def get_cre():
     with open('gitclients_credentials.json') as cred:
          data = json.load(cred)
     return data
+@cli.command("speak")
+@click.option("--repeat",default=1)
+@pass_config
+def say(config,repeat):
+    for x in xrange(repeat):
+        click.echo("hello",file=config.configfile_in)
 
 @cli.command("gitclient")
 @click.option('--name', prompt='Name of git client',
@@ -40,7 +50,7 @@ def gc(config, name):
     """This configures your current git project to use the git client
      you passed in with the name argument"""
     gitclient = name.lower().replace(" ","")
-    git_credentials = json.load(config.config_file)#get_cre()
+    git_credentials = json.load(config.configfile_in)#get_cre()
     try:
         os.system('git config user.name ' + git_credentials[gitclient]["user.name"])
         os.system('git config user.email ' + git_credentials[gitclient]["user.email"] )               
@@ -60,10 +70,13 @@ def add(config, gc,username,useremail):
     Add a configuration for a new git client
     """
     git_client = gc.lower().replace(" ", "")
-    git_credentials = json.load(config.config_file)
+    git_credentials = json.load(config.configfile_in)
     git_credentials[git_client] ={"user.name":username, "user.email":useremail}
-    with open("gitclients_credentials.json",'w') as fh:
-        json.dump(git_credentials,fh)
+    #with open("gitclients_credentials.json",'w') as fh:
+    try:
+        json.dump(git_credentials, config.configfile_out)
+    except:
+        click.echo("New client {} was not added".format(git_client))
     click.echo("New client {} has been added".format(git_client))
 
 if __name__ == '__main__':
